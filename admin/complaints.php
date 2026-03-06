@@ -1,6 +1,7 @@
 <?php
 require_once '../includes/auth.php';
 require_once '../includes/db.php';
+require_once 'layout.php';
 
 // Handle Delete Complaint
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_complaint'])) {
@@ -47,116 +48,91 @@ $complaints = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .sidebar-item-active { background-color: #eff6ff; color: #1d4ed8; border-right: 4px solid #1d4ed8; }
-        .table-container { border-radius: 24px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
         .img-zoom { transition: transform 0.3s ease; cursor: zoom-in; }
         .img-zoom:hover { transform: scale(1.05); }
     </style>
 </head>
-<body class="bg-slate-50">
+<body class="bg-slate-50 antialiased">
 
-    <nav class="fixed top-0 z-50 w-full bg-white border-b border-gray-100 shadow-sm">
-        <div class="px-3 py-3 lg:px-5 lg:pl-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center justify-start">
-                    <button data-drawer-target="logo-sidebar" data-drawer-toggle="logo-sidebar" aria-controls="logo-sidebar" type="button" class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200">
-                        <span class="sr-only">Open sidebar</span>
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"></path></svg>
-                    </button>
-                    <a href="#" class="flex ms-2 md:me-24">
-                        <span class="self-center text-xl font-black sm:text-2xl text-blue-600 uppercase tracking-tighter">MBG PANEL</span>
-                    </a>
-                </div>
-                <div class="flex items-center">
-                    <a href="index.php?logout=1" class="text-sm font-semibold text-red-600 hover:text-red-700 flex items-center bg-red-50 px-4 py-2 rounded-xl transition-all">LOGOUT</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-100 sm:translate-x-0 shadow-sm">
-        <div class="h-full px-3 pb-4 overflow-y-auto bg-white">
-            <ul class="space-y-2 font-medium">
-                <li><a href="index.php" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 font-semibold">Daftar Kelas</a></li>
-                <li><a href="reports.php" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 font-semibold">Laporan</a></li>
-                <li><a href="complaints.php" class="flex items-center p-3 text-gray-900 rounded-xl hover:bg-gray-50 sidebar-item-active font-bold">Keluhan</a></li>
-                <li><a href="../index.php" target="_blank" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 font-semibold">Lihat Beranda</a></li>
-            </ul>
-        </div>
-    </aside>
+    <?php render_navbar(); ?>
+    <?php render_sidebar('complaints.php'); ?>
 
     <div class="p-4 sm:ml-64">
-        <div class="p-4 mt-14">
+        <div class="p-4 mt-16 lg:p-10">
 
             <?php if (isset($_GET['deleted'])): ?>
-            <div id="alert-success" class="flex items-center p-4 mb-6 text-green-800 rounded-2xl bg-green-50 border border-green-100" role="alert">
-                <div class="ms-3 text-sm font-bold">Keluhan berhasil dihapus!</div>
-                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-success"><svg class="w-3 h-3" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/></svg></button>
+            <div id="alert-success" class="flex items-center p-5 mb-8 text-green-800 rounded-3xl bg-green-50 border border-green-100 shadow-sm animate-fade-in" role="alert">
+                <div class="w-10 h-10 bg-green-100 rounded-2xl flex items-center justify-center mr-4">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <div class="text-sm font-bold uppercase tracking-widest">Keluhan berhasil dihapus!</div>
+                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-xl p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8 transition-colors" data-dismiss-target="#alert-success"><svg class="w-3 h-3" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/></svg></button>
             </div>
             <?php endif; ?>
 
-            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
                 <div>
-                    <h1 class="text-3xl font-black text-gray-900 tracking-tight">Keluhan & Masukan</h1>
-                    <p class="text-sm text-gray-500 font-medium uppercase tracking-widest mt-1">Daftar Aspirasi Civitas SMKN 2 Bondowoso</p>
+                    <h1 class="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight leading-none mb-3">Keluhan & Masukan</h1>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-black text-orange-600 uppercase tracking-[0.2em] bg-orange-50 px-3 py-1.5 rounded-lg border border-orange-100">Daftar Aspirasi</span>
+                        <span class="text-xs font-bold text-slate-400">SMKN 2 Bondowoso</span>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <a href="export_complaints.php?start_date=<?= $start_date ?>&end_date=<?= $end_date ?>" target="_blank" class="text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl text-xs px-5 py-3 shadow-lg shadow-emerald-100 transition-all flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                        EXPORT PDF
-                    </a>
-                </div>
+                <a href="export_complaints.php?start_date=<?= $start_date ?>&end_date=<?= $end_date ?>" target="_blank" class="flex items-center text-white bg-emerald-600 hover:bg-emerald-700 font-black rounded-2xl text-[10px] px-8 py-4.5 tracking-widest uppercase shadow-lg shadow-emerald-100 transition-all">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    Export PDF
+                </a>
             </div>
 
             <!-- Filter Section -->
-            <div class="bg-white p-6 rounded-[24px] border border-gray-100 mb-8 shadow-sm">
-                <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div class="bg-white p-8 rounded-[32px] border border-slate-100 mb-10 shadow-sm shadow-slate-200/50">
+                <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
                     <div>
-                        <label class="block mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Mulai Tanggal</label>
-                        <input type="date" name="start_date" value="<?= $start_date ?>" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-3">
+                        <label class="block mb-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Mulai Tanggal</label>
+                        <input type="date" name="start_date" value="<?= $start_date ?>" class="bg-slate-50 border-2 border-slate-50 text-slate-900 text-sm font-bold rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 block w-full p-4 transition-all outline-none">
                     </div>
                     <div>
-                        <label class="block mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Sampai Tanggal</label>
-                        <input type="date" name="end_date" value="<?= $end_date ?>" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-3">
+                        <label class="block mb-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">Sampai Tanggal</label>
+                        <input type="date" name="end_date" value="<?= $end_date ?>" class="bg-slate-50 border-2 border-slate-50 text-slate-900 text-sm font-bold rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 block w-full p-4 transition-all outline-none">
                     </div>
-                    <div class="flex gap-2">
-                        <button type="submit" class="flex-grow text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-xl text-xs px-5 py-3.5 transition-all">FILTER</button>
-                        <a href="complaints.php" class="bg-gray-100 text-gray-600 font-bold rounded-xl text-xs px-5 py-3.5 transition-all">RESET</a>
+                    <div class="flex gap-3">
+                        <button type="submit" class="flex-grow text-white bg-blue-600 hover:bg-blue-700 font-black rounded-2xl text-[10px] px-5 py-4.5 tracking-widest transition-all">FILTER</button>
+                        <a href="complaints.php" class="bg-slate-100 text-slate-500 font-black rounded-2xl text-[10px] px-5 py-4.5 tracking-widest transition-all text-center">RESET</a>
                     </div>
                 </form>
             </div>
 
-            <div class="grid grid-cols-1 gap-6">
+            <div class="grid grid-cols-1 gap-8">
                 <?php foreach ($complaints as $complaint): ?>
-                <div class="bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6">
+                <div class="bg-white p-8 rounded-[32px] shadow-sm shadow-slate-200/50 border border-slate-100 flex flex-col md:flex-row gap-8 hover:shadow-xl transition-all group">
                     <?php if ($complaint['image_path']): ?>
-                    <div class="w-full md:w-48 h-48 flex-shrink-0 relative overflow-hidden rounded-2xl border border-gray-100">
+                    <div class="w-full md:w-56 h-56 flex-shrink-0 relative overflow-hidden rounded-3xl border border-slate-50 shadow-inner">
                         <img src="../<?= $complaint['image_path'] ?>" alt="Attachment"
                              class="w-full h-full object-cover img-zoom"
                              onclick="showOverlay('../<?= $complaint['image_path'] ?>')">
                     </div>
                     <?php endif; ?>
-                    <div class="flex-grow">
-                        <div class="flex justify-between items-start mb-4">
+                    <div class="flex-grow flex flex-col">
+                        <div class="flex justify-between items-start mb-6">
                             <div>
-                                <span class="bg-blue-50 text-blue-700 text-[9px] font-black px-2.5 py-1 rounded-lg uppercase tracking-widest border border-blue-100"><?= $complaint['role'] ?></span>
-                                <h3 class="text-lg font-black text-slate-900 mt-2"><?= htmlspecialchars($complaint['name']) ?></h3>
+                                <span class="bg-blue-50 text-blue-700 text-[9px] font-black px-3 py-1.5 rounded-lg uppercase tracking-widest border border-blue-100"><?= $complaint['role'] ?></span>
+                                <h3 class="text-xl font-black text-slate-900 mt-3 tracking-tight"><?= htmlspecialchars($complaint['name']) ?></h3>
                                 <?php if ($complaint['class_name']): ?>
-                                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Kelas: <?= htmlspecialchars($complaint['class_name']) ?></p>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-1">Kelas: <?= htmlspecialchars($complaint['class_name']) ?></p>
                                 <?php endif; ?>
                             </div>
                             <div class="text-right">
-                                <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest"><?= date('d M Y H:i', strtotime($complaint['created_at'])) ?></span>
+                                <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest"><?= date('d M Y H:i', strtotime($complaint['created_at'])) ?></span>
                             </div>
                         </div>
-                        <p class="text-sm text-slate-600 leading-relaxed bg-slate-50/50 p-4 rounded-xl italic">
+                        <div class="flex-grow bg-slate-50/50 p-6 rounded-2xl italic text-slate-600 text-sm leading-relaxed border border-slate-50 group-hover:bg-white transition-colors group-hover:border-slate-100">
                             "<?= nl2br(htmlspecialchars($complaint['description'])) ?>"
-                        </p>
-                        <div class="mt-4 flex justify-end">
+                        </div>
+                        <div class="mt-6 flex justify-end">
                             <form method="POST" onsubmit="return confirm('Hapus keluhan ini?')" class="inline">
                                 <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                 <input type="hidden" name="id" value="<?= $complaint['id'] ?>">
-                                <button type="submit" name="delete_complaint" class="text-rose-600 hover:text-rose-700 font-bold text-xs uppercase tracking-widest bg-rose-50 px-4 py-2 rounded-lg transition-all">Hapus Keluhan</button>
+                                <button type="submit" name="delete_complaint" class="text-rose-600 hover:text-white hover:bg-rose-600 font-black text-[9px] uppercase tracking-widest bg-rose-50 px-5 py-3 rounded-xl transition-all border border-rose-100 group-hover:shadow-lg group-hover:shadow-rose-100">Hapus Keluhan</button>
                             </form>
                         </div>
                     </div>
@@ -164,8 +140,11 @@ $complaints = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <?php endforeach; ?>
 
                 <?php if (empty($complaints)): ?>
-                <div class="bg-white p-20 rounded-[32px] border border-dashed border-gray-200 text-center">
-                    <p class="text-slate-300 font-black uppercase tracking-widest text-xs">Belum ada keluhan masuk</p>
+                <div class="bg-white p-24 rounded-[40px] border border-dashed border-slate-200 text-center">
+                    <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-10 h-10 text-slate-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                    </div>
+                    <p class="text-slate-300 font-black uppercase tracking-[0.3em] text-xs">Belum ada keluhan masuk</p>
                 </div>
                 <?php endif; ?>
             </div>
@@ -173,11 +152,11 @@ $complaints = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <!-- Overlay Modal -->
-    <div id="imageOverlay" class="fixed inset-0 z-[60] hidden bg-black/90 backdrop-blur-sm flex items-center justify-center p-4" onclick="hideOverlay()">
-        <button class="absolute top-6 right-6 text-white hover:text-gray-300">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <div id="imageOverlay" class="fixed inset-0 z-[60] hidden bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4" onclick="hideOverlay()">
+        <button class="absolute top-8 right-8 text-white hover:text-blue-400 transition-colors">
+            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
-        <img id="overlayImg" src="" class="max-w-full max-h-full rounded-lg shadow-2xl transition-transform duration-300" onclick="event.stopPropagation()">
+        <img id="overlayImg" src="" class="max-w-full max-h-[90vh] rounded-[32px] shadow-2xl transition-all duration-300" onclick="event.stopPropagation()">
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
@@ -188,12 +167,19 @@ $complaints = $stmt->fetchAll(PDO::FETCH_ASSOC);
             img.src = src;
             overlay.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
+            img.classList.add('scale-100');
+            img.classList.remove('scale-95');
         }
 
         function hideOverlay() {
             const overlay = document.getElementById('imageOverlay');
-            overlay.classList.add('hidden');
-            document.body.style.overflow = 'auto';
+            const img = document.getElementById('overlayImg');
+            img.classList.remove('scale-100');
+            img.classList.add('scale-95');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 200);
         }
     </script>
 </body>
