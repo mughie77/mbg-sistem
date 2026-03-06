@@ -2,6 +2,14 @@
 require_once '../includes/auth.php';
 require_once '../includes/db.php';
 
+// Handle Delete Report
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_report'])) {
+    $stmt = $db->prepare("DELETE FROM reports WHERE id = ?");
+    $stmt->execute([$_POST['id']]);
+    header("Location: reports.php?deleted=1");
+    exit();
+}
+
 $query = "SELECT r.*, c.name, c.homeroom_teacher, c.total_students
           FROM reports r
           JOIN classes c ON r.class_id = c.id
@@ -47,15 +55,23 @@ $reports = $db->query($query)->fetchAll(PDO::FETCH_ASSOC);
     <aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-100 sm:translate-x-0 shadow-sm">
         <div class="h-full px-3 pb-4 overflow-y-auto bg-white">
             <ul class="space-y-2 font-medium">
-                <li><a href="index.php" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50">Daftar Kelas</a></li>
+                <li><a href="index.php" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 font-semibold">Daftar Kelas</a></li>
                 <li><a href="reports.php" class="flex items-center p-3 text-gray-900 rounded-xl hover:bg-gray-50 sidebar-item-active font-bold">Laporan</a></li>
-                <li><a href="../index.php" target="_blank" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50">Lihat Beranda</a></li>
+                <li><a href="../index.php" target="_blank" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 font-semibold">Lihat Beranda</a></li>
             </ul>
         </div>
     </aside>
 
     <div class="p-4 sm:ml-64">
         <div class="p-4 mt-14">
+
+            <?php if (isset($_GET['deleted']) || isset($_GET['updated'])): ?>
+            <div id="alert-success" class="flex items-center p-4 mb-6 text-green-800 rounded-2xl bg-green-50 border border-green-100" role="alert">
+                <div class="ms-3 text-sm font-bold">Laporan berhasil diperbarui!</div>
+                <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8" data-dismiss-target="#alert-success"><svg class="w-3 h-3" fill="none" viewBox="0 0 14 14"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/></svg></button>
+            </div>
+            <?php endif; ?>
+
             <div class="mb-8">
                 <h1 class="text-3xl font-black text-gray-900 tracking-tight">Semua Laporan</h1>
                 <p class="text-sm text-gray-500 font-medium uppercase tracking-widest mt-1">Histori Laporan MBG</p>
@@ -65,12 +81,12 @@ $reports = $db->query($query)->fetchAll(PDO::FETCH_ASSOC);
                 <table class="w-full text-sm text-left text-gray-500">
                     <thead class="text-xs text-gray-400 uppercase bg-gray-50/50 border-b border-gray-100">
                         <tr>
-                            <th class="px-6 py-5">Tanggal</th>
-                            <th class="px-6 py-5">Kelas</th>
-                            <th class="px-6 py-5">Wali Kelas</th>
-                            <th class="px-6 py-5 text-center">Penerima MBG</th>
-                            <th class="px-6 py-5 text-center">Total</th>
-                            <th class="px-6 py-5">Submit Pada</th>
+                            <th class="px-6 py-5 font-bold">Tanggal</th>
+                            <th class="px-6 py-5 font-bold">Kelas</th>
+                            <th class="px-6 py-5 font-bold">Wali Kelas</th>
+                            <th class="px-6 py-5 text-center font-bold">Hadir</th>
+                            <th class="px-6 py-5 text-center font-bold">Total</th>
+                            <th class="px-6 py-5 font-bold">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
@@ -83,7 +99,15 @@ $reports = $db->query($query)->fetchAll(PDO::FETCH_ASSOC);
                                 <span class="bg-emerald-50 text-emerald-700 text-xs font-black px-3 py-1.5 rounded-full border border-emerald-100"><?= $report['students_present'] ?></span>
                             </td>
                             <td class="px-6 py-5 text-center font-bold text-gray-400"><?= $report['total_students'] ?></td>
-                            <td class="px-6 py-5 text-xs text-gray-400"><?= $report['created_at'] ?></td>
+                            <td class="px-6 py-5">
+                                <div class="flex items-center gap-3">
+                                    <a href="edit_report.php?id=<?= $report['id'] ?>" class="text-blue-600 hover:text-blue-700 font-bold">Edit</a>
+                                    <form method="POST" onsubmit="return confirm('Hapus laporan ini?')" class="inline">
+                                        <input type="hidden" name="id" value="<?= $report['id'] ?>">
+                                        <button type="submit" name="delete_report" class="text-red-500 hover:text-red-600 font-bold">Hapus</button>
+                                    </form>
+                                </div>
+                            </td>
                         </tr>
                         <?php endforeach; ?>
                         <?php if (empty($reports)): ?>
@@ -94,5 +118,6 @@ $reports = $db->query($query)->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
 </body>
 </html>
