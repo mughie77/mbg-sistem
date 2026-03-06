@@ -27,10 +27,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_complaint'])) 
 
     $image_path = null;
     if (isset($_FILES['image']) && $_FILES['image']['error'] === 0) {
+        $max_size = 5 * 1024 * 1024; // 5MB
         $allowed_extensions = ['jpg', 'jpeg', 'png', 'webp'];
         $file_extension = strtolower(pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION));
 
-        if (in_array($file_extension, $allowed_extensions)) {
+        if ($_FILES['image']['size'] > $max_size) {
+            $message = ['type' => 'error', 'text' => 'Ukuran file terlalu besar. Maksimal 5MB.'];
+        } elseif (!in_array($file_extension, $allowed_extensions)) {
+            $message = ['type' => 'error', 'text' => 'Format file tidak didukung. Hanya JPG, PNG, dan WEBP yang diperbolehkan.'];
+        } else {
             $target_dir = "uploads/";
             if (!file_exists($target_dir)) {
                 mkdir($target_dir, 0777, true);
@@ -41,8 +46,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_complaint'])) 
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
                 $image_path = $target_file;
             }
-        } else {
-            $message = ['type' => 'error', 'text' => 'Format file tidak didukung. Hanya JPG, PNG, dan WEBP yang diperbolehkan.'];
         }
     }
 

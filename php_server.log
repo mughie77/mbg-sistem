@@ -1,0 +1,25 @@
+[Fri Mar  6 03:24:37 2026] PHP 8.3.6 Development Server (http://localhost:8000) started
+[Fri Mar  6 03:24:40 2026] [::1]:44174 Accepted
+[Fri Mar  6 03:24:40 2026] [::1]:44174 [200]: GET /index.php
+[Fri Mar  6 03:24:40 2026] [::1]:44174 Closing
+[Fri Mar  6 03:24:43 2026] [::1]:45160 Accepted
+[Fri Mar  6 03:24:43 2026] [::1]:45160 [200]: GET /input_penerima.php
+[Fri Mar  6 03:24:43 2026] [::1]:45160 Closing
+[Fri Mar  6 03:24:44 2026] [::1]:45166 Accepted
+[Fri Mar  6 03:24:44 2026] [::1]:45166 [200]: GET /input_penerima.php?get_class_info=1
+[Fri Mar  6 03:24:44 2026] [::1]:45166 Closing
+[Fri Mar  6 03:24:45 2026] [::1]:45176 Accepted
+[Fri Mar  6 03:24:45 2026] [::1]:45176 [200]: POST /input_penerima.php
+[Fri Mar  6 03:24:45 2026] [::1]:45176 Closing
+[Fri Mar  6 03:24:46 2026] [::1]:45184 Accepted
+[Fri Mar  6 03:24:46 2026] [::1]:45184 [302]: GET /admin/index.php
+[Fri Mar  6 03:24:46 2026] [::1]:45184 Closing
+[Fri Mar  6 03:24:46 2026] [::1]:45192 Accepted
+[Fri Mar  6 03:24:46 2026] [::1]:45192 [200]: GET /admin/login.php
+[Fri Mar  6 03:24:46 2026] [::1]:45192 Closing
+[Fri Mar  6 03:24:46 2026] [::1]:45198 Accepted
+[Fri Mar  6 03:24:46 2026] [::1]:45198 [302]: POST /admin/login.php
+[Fri Mar  6 03:24:46 2026] [::1]:45198 Closing
+[Fri Mar  6 03:24:46 2026] [::1]:45210 Accepted
+[Fri Mar  6 03:24:46 2026] [::1]:45210 [200]: GET /admin/index.php
+[Fri Mar  6 03:24:46 2026] [::1]:45210 Closing
