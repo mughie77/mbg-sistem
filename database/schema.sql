@@ -17,6 +17,17 @@ CREATE TABLE IF NOT EXISTS reports (
     FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS complaints (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    role ENUM('Siswa', 'Guru', 'Tendik') NOT NULL,
+    class_id INT DEFAULT NULL,
+    image_path VARCHAR(255) DEFAULT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL
+);
+
 INSERT INTO classes (name, homeroom_teacher, total_students) VALUES
 ('X RPL 1', 'Budiono', 36),
 ('X RPL 2', 'Siti Aminah', 32),

@@ -18,6 +18,7 @@ if (!$class) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_class'])) {
+    verify_csrf();
     $stmt = $db->prepare("UPDATE classes SET name = ?, homeroom_teacher = ?, total_students = ? WHERE id = ?");
     $stmt->execute([$_POST['name'], $_POST['homeroom_teacher'], $_POST['total_students'], $id]);
     header('Location: index.php?updated=1');
@@ -53,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_class'])) {
     <div class="max-w-2xl mx-auto mt-24 px-4">
         <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
             <form method="POST" class="space-y-6">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div>
                     <label class="block mb-2 text-sm font-semibold text-gray-700">Nama Kelas</label>
                     <input type="text" name="name" value="<?= htmlspecialchars($class['name']) ?>" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-4">

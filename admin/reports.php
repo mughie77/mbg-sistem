@@ -4,6 +4,7 @@ require_once '../includes/db.php';
 
 // Handle Delete Report
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_report'])) {
+    verify_csrf();
     $stmt = $db->prepare("DELETE FROM reports WHERE id = ?");
     $stmt->execute([$_POST['id']]);
     header("Location: reports.php?deleted=1");
@@ -57,6 +58,7 @@ $reports = $db->query($query)->fetchAll(PDO::FETCH_ASSOC);
             <ul class="space-y-2 font-medium">
                 <li><a href="index.php" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 font-semibold">Daftar Kelas</a></li>
                 <li><a href="reports.php" class="flex items-center p-3 text-gray-900 rounded-xl hover:bg-gray-50 sidebar-item-active font-bold">Laporan</a></li>
+                <li><a href="complaints.php" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 font-semibold">Keluhan</a></li>
                 <li><a href="../index.php" target="_blank" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 font-semibold">Lihat Beranda</a></li>
             </ul>
         </div>
@@ -103,6 +105,7 @@ $reports = $db->query($query)->fetchAll(PDO::FETCH_ASSOC);
                                 <div class="flex items-center gap-3">
                                     <a href="edit_report.php?id=<?= $report['id'] ?>" class="text-blue-600 hover:text-blue-700 font-bold">Edit</a>
                                     <form method="POST" onsubmit="return confirm('Hapus laporan ini?')" class="inline">
+                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                         <input type="hidden" name="id" value="<?= $report['id'] ?>">
                                         <button type="submit" name="delete_report" class="text-red-500 hover:text-red-600 font-bold">Hapus</button>
                                     </form>

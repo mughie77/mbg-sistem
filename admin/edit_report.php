@@ -18,6 +18,7 @@ if (!$report) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_report'])) {
+    verify_csrf();
     $present = (int)$_POST['students_present'];
     if ($present >= 0 && $present <= $report['total_students']) {
         $stmt = $db->prepare("UPDATE reports SET students_present = ? WHERE id = ?");
@@ -66,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_report'])) {
             <?php endif; ?>
 
             <form method="POST" class="space-y-6">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                 <div>
                     <label class="block mb-2 text-sm font-bold text-gray-700 uppercase tracking-widest">Jumlah Siswa Hadir Penerima MBG</label>
                     <div class="relative">

@@ -4,6 +4,7 @@ require_once '../includes/db.php';
 
 // Handle Add Class
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_class'])) {
+    verify_csrf();
     $stmt = $db->prepare("INSERT INTO classes (name, homeroom_teacher, total_students) VALUES (?, ?, ?)");
     $stmt->execute([$_POST['name'], $_POST['homeroom_teacher'], $_POST['total_students']]);
     header("Location: index.php?added=1");
@@ -12,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_class'])) {
 
 // Handle Delete Class
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_class'])) {
+    verify_csrf();
     $stmt = $db->prepare("DELETE FROM classes WHERE id = ?");
     $stmt->execute([$_POST['id']]);
     header("Location: index.php?deleted=1");
@@ -89,6 +91,12 @@ $classes = $db->query("SELECT * FROM classes ORDER BY name ASC")->fetchAll(PDO::
                     </a>
                 </li>
                 <li>
+                    <a href="complaints.php" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 group">
+                        <svg class="flex-shrink-0 w-5 h-5 transition duration-75 text-gray-500 group-hover:text-gray-900" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"></path></svg>
+                        <span class="flex-1 ms-3 whitespace-nowrap font-semibold">Keluhan</span>
+                    </a>
+                </li>
+                <li>
                     <a href="../index.php" target="_blank" class="flex items-center p-3 text-gray-600 rounded-xl hover:bg-gray-50 group">
                         <svg class="flex-shrink-0 w-5 h-5 transition duration-75" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z"/>
@@ -150,6 +158,7 @@ $classes = $db->query("SELECT * FROM classes ORDER BY name ASC")->fetchAll(PDO::
                                         Edit
                                     </a>
                                     <form method="POST" onsubmit="return confirm('Hapus kelas ini?')" class="inline">
+                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                                         <input type="hidden" name="id" value="<?= $class['id'] ?>">
                                         <button type="submit" name="delete_class" class="font-bold text-red-500 hover:text-red-600 flex items-center">
                                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -178,6 +187,7 @@ $classes = $db->query("SELECT * FROM classes ORDER BY name ASC")->fetchAll(PDO::
                     </button>
                 </div>
                 <form class="p-6 space-y-5" method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
                     <div>
                         <label class="block mb-2 text-sm font-bold text-gray-700">Nama Kelas</label>
                         <input type="text" name="name" required class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-4 transition-all" placeholder="Misal: XII RPL 1">
