@@ -18,11 +18,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_complaint'])) 
     exit();
 }
 
+$start_date = $_GET['start_date'] ?? '';
+$end_date = $_GET['end_date'] ?? '';
+
 $query = "SELECT comp.*, c.name as class_name
           FROM complaints comp
-          LEFT JOIN classes c ON comp.class_id = c.id
-          ORDER BY comp.created_at DESC";
-$complaints = $db->query($query)->fetchAll(PDO::FETCH_ASSOC);
+          LEFT JOIN classes c ON comp.class_id = c.id";
+
+$params = [];
+if ($start_date && $end_date) {
+    $query .= " WHERE DATE(comp.created_at) BETWEEN ? AND ?";
+    $params = [$start_date, $end_date];
+}
+
+$query .= " ORDER BY comp.created_at DESC";
+$stmt = $db->prepare($query);
+$stmt->execute($params);
+$complaints = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -37,6 +49,8 @@ $complaints = $db->query($query)->fetchAll(PDO::FETCH_ASSOC);
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
         .sidebar-item-active { background-color: #eff6ff; color: #1d4ed8; border-right: 4px solid #1d4ed8; }
         .table-container { border-radius: 24px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); }
+        .img-zoom { transition: transform 0.3s ease; cursor: zoom-in; }
+        .img-zoom:hover { transform: scale(1.05); }
     </style>
 </head>
 <body class="bg-slate-50">
@@ -81,17 +95,45 @@ $complaints = $db->query($query)->fetchAll(PDO::FETCH_ASSOC);
             </div>
             <?php endif; ?>
 
-            <div class="mb-8">
-                <h1 class="text-3xl font-black text-gray-900 tracking-tight">Keluhan & Masukan</h1>
-                <p class="text-sm text-gray-500 font-medium uppercase tracking-widest mt-1">Daftar Aspirasi Civitas SMKN 2 Bondowoso</p>
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+                <div>
+                    <h1 class="text-3xl font-black text-gray-900 tracking-tight">Keluhan & Masukan</h1>
+                    <p class="text-sm text-gray-500 font-medium uppercase tracking-widest mt-1">Daftar Aspirasi Civitas SMKN 2 Bondowoso</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <a href="export_complaints.php?start_date=<?= $start_date ?>&end_date=<?= $end_date ?>" target="_blank" class="text-white bg-emerald-600 hover:bg-emerald-700 font-bold rounded-xl text-xs px-5 py-3 shadow-lg shadow-emerald-100 transition-all flex items-center">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                        EXPORT PDF
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="bg-white p-6 rounded-[24px] border border-gray-100 mb-8 shadow-sm">
+                <form method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <div>
+                        <label class="block mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Mulai Tanggal</label>
+                        <input type="date" name="start_date" value="<?= $start_date ?>" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-3">
+                    </div>
+                    <div>
+                        <label class="block mb-2 text-[10px] font-black text-gray-400 uppercase tracking-widest">Sampai Tanggal</label>
+                        <input type="date" name="end_date" value="<?= $end_date ?>" class="bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-blue-500 focus:border-blue-500 block w-full p-3">
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="submit" class="flex-grow text-white bg-blue-600 hover:bg-blue-700 font-bold rounded-xl text-xs px-5 py-3.5 transition-all">FILTER</button>
+                        <a href="complaints.php" class="bg-gray-100 text-gray-600 font-bold rounded-xl text-xs px-5 py-3.5 transition-all">RESET</a>
+                    </div>
+                </form>
             </div>
 
             <div class="grid grid-cols-1 gap-6">
                 <?php foreach ($complaints as $complaint): ?>
                 <div class="bg-white p-6 rounded-[24px] shadow-sm border border-gray-100 flex flex-col md:flex-row gap-6">
                     <?php if ($complaint['image_path']): ?>
-                    <div class="w-full md:w-48 h-48 flex-shrink-0">
-                        <img src="../<?= $complaint['image_path'] ?>" alt="Attachment" class="w-full h-full object-cover rounded-2xl border border-gray-100">
+                    <div class="w-full md:w-48 h-48 flex-shrink-0 relative overflow-hidden rounded-2xl border border-gray-100">
+                        <img src="../<?= $complaint['image_path'] ?>" alt="Attachment"
+                             class="w-full h-full object-cover img-zoom"
+                             onclick="showOverlay('../<?= $complaint['image_path'] ?>')">
                     </div>
                     <?php endif; ?>
                     <div class="flex-grow">
@@ -129,6 +171,30 @@ $complaints = $db->query($query)->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </div>
+
+    <!-- Overlay Modal -->
+    <div id="imageOverlay" class="fixed inset-0 z-[60] hidden bg-black/90 backdrop-blur-sm flex items-center justify-center p-4" onclick="hideOverlay()">
+        <button class="absolute top-6 right-6 text-white hover:text-gray-300">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <img id="overlayImg" src="" class="max-w-full max-h-full rounded-lg shadow-2xl transition-transform duration-300" onclick="event.stopPropagation()">
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+    <script>
+        function showOverlay(src) {
+            const overlay = document.getElementById('imageOverlay');
+            const img = document.getElementById('overlayImg');
+            img.src = src;
+            overlay.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideOverlay() {
+            const overlay = document.getElementById('imageOverlay');
+            overlay.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+    </script>
 </body>
 </html>

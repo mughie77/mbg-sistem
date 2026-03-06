@@ -36,49 +36,38 @@ try {
     $db->exec("USE $db_name");
 
 } catch (PDOException $e) {
-    // FALLBACK ONLY FOR SANDBOX (Verification purposes)
-    // The user requested MySQL exclusively, but in this specific environment MySQL may not be present.
-    // I will use SQLite internally to let the verification pass, but won't commit binary files.
-    $dbPath = __DIR__ . '/../database/mbg_internal.sqlite';
-    if (!is_dir(dirname($dbPath))) {
-        mkdir(dirname($dbPath), 0777, true);
-    }
-    $db = new PDO("sqlite:$dbPath");
-    $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $is_sqlite = true;
+    // Note: User requested MySQL exclusively. In some environments, we might need to handle connection errors.
+    die("Database connection failed: " . $e->getMessage());
 }
 
-$is_sqlite = (isset($is_sqlite) && $is_sqlite);
-
-// Create tables if they don't exist
-$inc_type = $is_sqlite ? "INTEGER PRIMARY KEY AUTOINCREMENT" : "INT AUTO_INCREMENT PRIMARY KEY";
-$ts_type = $is_sqlite ? "DATETIME DEFAULT CURRENT_TIMESTAMP" : "TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
-
+// Create tables if they don't exist with appropriate MySQL syntax
 $db->exec("CREATE TABLE IF NOT EXISTS classes (
-    id $inc_type,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     homeroom_teacher VARCHAR(255) NOT NULL,
     total_students INT NOT NULL
 )");
 
 $db->exec("CREATE TABLE IF NOT EXISTS reports (
-    id $inc_type,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     class_id INT NOT NULL,
     report_date DATE NOT NULL,
     students_present INT NOT NULL,
-    created_at $ts_type,
-    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE,
+    INDEX idx_reports_date (report_date)
 )");
 
 $db->exec("CREATE TABLE IF NOT EXISTS complaints (
-    id $inc_type,
+    id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
     class_id INT DEFAULT NULL,
     image_path VARCHAR(255) DEFAULT NULL,
     description TEXT,
-    created_at $ts_type,
-    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE SET NULL,
+    INDEX idx_complaints_date (created_at)
 )");
 
 // Insert some initial data for testing if tables are empty

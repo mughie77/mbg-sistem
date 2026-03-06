@@ -22,6 +22,10 @@ $today = date('Y-m-d');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard MBG - SMKN 2 Bondowoso</title>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet" />
     <style>
@@ -99,7 +103,7 @@ $today = date('Y-m-d');
                     </div>
                     <div class="pt-16 pb-10 px-6 text-center flex-grow">
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Monitoring</p>
-                        <h3 class="text-lg font-black text-blue-600 leading-tight uppercase tracking-tight">Status<br>Hari Ini</h3>
+                        <h3 class="text-lg font-black text-blue-600 leading-tight uppercase tracking-tight">Lihat Penerimaan<br>Hari Ini</h3>
                     </div>
                 </div>
             </a>
