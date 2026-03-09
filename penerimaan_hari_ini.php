@@ -17,11 +17,11 @@ function getIndonesianDate($date) {
 $today = date('Y-m-d');
 
 // Get all classes and their report status for today
-// Sorting: Unsubmitted classes first, then submitted classes at the bottom (per requirement #3)
+// Sorting: Submitted classes first, then unsubmitted classes at the bottom
 $query = "SELECT c.*, r.students_present, r.created_at
           FROM classes c
           LEFT JOIN reports r ON c.id = r.class_id AND r.report_date = ?
-          ORDER BY (r.students_present IS NOT NULL) ASC, c.name ASC";
+          ORDER BY (r.students_present IS NOT NULL) DESC, c.name ASC";
 $stmt = $db->prepare($query);
 $stmt->execute([$today]);
 $classes_status = $stmt->fetchAll(PDO::FETCH_ASSOC);
