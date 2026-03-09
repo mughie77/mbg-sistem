@@ -9,6 +9,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Timezone Setting to WIB (Western Indonesia Time / UTC+7)
+date_default_timezone_set('Asia/Jakarta');
+
 // CSRF Protection
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -34,6 +37,9 @@ try {
     $db = new PDO($dsn, $username, $password, $options);
     $db->exec("CREATE DATABASE IF NOT EXISTS $db_name");
     $db->exec("USE $db_name");
+
+    // Sync MySQL session timezone with PHP
+    $db->exec("SET time_zone = '+07:00'");
 
 } catch (PDOException $e) {
     // Note: User requested MySQL exclusively. In some environments, we might need to handle connection errors.
